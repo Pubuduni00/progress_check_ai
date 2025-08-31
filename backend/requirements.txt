@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pymongo
+motor
+google-generativeai
+python-dotenv
+pydantic
+python-multipart
+python-dateutil
