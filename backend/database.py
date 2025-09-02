@@ -166,7 +166,7 @@ async def cleanup_abandoned_temp_updates(hours_old: int = 24):
         followup_sessions = database.database[Config.FOLLOWUP_SESSIONS_COLLECTION]
         
         # Calculate cutoff time
-        cutoff_time = datetime.utcnow() - timedelta(hours=hours_old)
+        cutoff_time = datetime.now() - timedelta(hours=hours_old)
         
         # Find abandoned temp updates
         abandoned_cursor = temp_collection.find({
@@ -371,7 +371,7 @@ async def move_temp_to_permanent(temp_id: str, additional_data: dict = None) -> 
         # Set completion status
         permanent_update["followupCompleted"] = True
         permanent_update["status"] = "completed"
-        permanent_update["completedAt"] = datetime.utcnow()
+        permanent_update["completedAt"] = datetime.now()
         
         # Check for existing permanent update (override logic)
         existing_permanent = await work_updates_collection.find_one({

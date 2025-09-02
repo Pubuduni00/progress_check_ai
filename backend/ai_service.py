@@ -29,7 +29,7 @@ class AIFollowupService:
             logger.info(f"Starting AI question generation for user: {user_id}")
             
             # Get user's recent work updates (last 7 days) for context
-            week_ago = datetime.utcnow() - timedelta(days=7)
+            week_ago = datetime.now() - timedelta(days=7)
             
             # Query BOTH permanent AND temporary collections
             work_updates_collection = self.db[Config.WORK_UPDATES_COLLECTION]
@@ -121,10 +121,7 @@ class AIFollowupService:
         if challenges:
             context_lines.append(f"Challenges Today: {challenges}")
         
-        # Plans (optional)
-        # plans = work_data.get('plans', '').strip() if work_data.get('plans') else None
-        # if plans:
-        #     context_lines.append(f"Plans for Tomorrow: {plans}")
+       
         
         context_lines.append("---")
         return '\n'.join(context_lines)
@@ -215,7 +212,7 @@ make them feel natural to answer."""
         if not recent_docs:
             return "No previous plans found"
         
-        yesterday = datetime.utcnow().date() - timedelta(days=1)
+        yesterday = datetime.now().date() - timedelta(days=1)
         
         # First, try to find plans from exactly yesterday
         for doc in recent_docs:
@@ -228,7 +225,7 @@ make them feel natural to answer."""
         
         # If no plans found for yesterday, get the most recent plans available
         # (excluding today's entry if it exists)
-        today = datetime.utcnow().date()
+        today = datetime.now().date()
         
         for doc in recent_docs:
             timestamp = self._extract_timestamp(doc)
@@ -364,7 +361,7 @@ make them feel natural to answer."""
         logger.info(f"Called save_followup_session with userId: {user_id}")
         
         try:
-            formatted_date = datetime.utcnow().strftime('%Y-%m-%d')
+            formatted_date = datetime.now().strftime('%Y-%m-%d')
             session_id = f"{user_id}_{formatted_date}"
             
             followup_collection = self.db[Config.FOLLOWUP_SESSIONS_COLLECTION]
@@ -375,7 +372,7 @@ make them feel natural to answer."""
                 "questions": questions,
                 "answers": [""] * len(questions),
                 "status": SessionStatus.PENDING,
-                "createdAt": datetime.utcnow(),
+                "createdAt": datetime.now(),
                 "completedAt": None
             }
             
@@ -400,7 +397,7 @@ make them feel natural to answer."""
             update_doc = {
                 "answers": answers,
                 "status": SessionStatus.COMPLETED,
-                "completedAt": datetime.utcnow()
+                "completedAt": datetime.now()
             }
             
             result = await followup_collection.update_one(
@@ -447,74 +444,7 @@ make them feel natural to answer."""
             logger.error(f"Error getting pending follow-up session: {e}")
             return None
     
-#     async def analyze_intern_progress(self, user_id: str) -> str:
-#         """Analyze intern's responses using AI"""
-#         try:
-#             # Get recent followup sessions
-#             followup_collection = self.db[Config.FOLLOWUP_SESSIONS_COLLECTION]
-            
-#             cursor = followup_collection.find(
-#                 {
-#                     "userId": user_id,
-#                     "status": SessionStatus.COMPLETED
-#                 }
-#             ).sort("createdAt", DESCENDING).limit(5)
-            
-#             sessions = await cursor.to_list(5)
-            
-#             if not sessions:
-#                 return "No completed follow-up sessions found for analysis."
-            
-#             # Build analysis context
-#             analysis_context = self._build_analysis_context(sessions)
-            
-#             prompt = f"""Analyze this intern's daily check-in responses and provide practical insights for their mentor:
 
-# ## Follow-up Sessions Data:
-# {analysis_context}
-
-# ## Analysis Focus:
-# 1. **Progress Patterns**: Are they consistently moving forward or getting stuck?
-# 2. **Common Challenges**: What problems keep coming up?
-# 3. **Learning Approach**: How do they handle new concepts and obstacles?
-# 4. **Support Needs**: Where do they need more guidance?
-# 5. **Communication Style**: How clearly do they express their situation?
-
-# Provide a concise, actionable summary that helps the mentor understand:
-# - What's going well
-# - What needs attention
-# - Specific ways to help them improve
-# - Any concerning patterns to watch
-
-# Keep it practical and focused on actionable insights."""
-
-#             response = self.model.generate_content(prompt)
-#             return response.text or "Unable to generate analysis at this time."
-            
-#         except Exception as e:
-#             logger.error(f"Error analyzing intern progress: {e}")
-#             return "Error occurred while analyzing progress."
-    
-#     def _build_analysis_context(self, sessions: List[Dict[str, Any]]) -> str:
-#         """Build context for analysis"""
-#         context_lines = []
-        
-#         for i, session in enumerate(sessions):
-#             created_at = session.get('createdAt')
-#             date_str = created_at.strftime('%Y-%m-%d') if created_at else 'Unknown date'
-#             questions = session.get('questions', [])
-#             answers = session.get('answers', [])
-            
-#             context_lines.append(f"Session {i + 1} ({date_str}):")
-            
-#             for j in range(min(len(questions), len(answers))):
-#                 context_lines.append(f"Q: {questions[j]}")
-#                 context_lines.append(f"A: {answers[j]}")
-#                 context_lines.append("")
-            
-#             context_lines.append("---")
-        
-#         return '\n'.join(context_lines)
     
     async def test_ai_connection(self) -> bool:
         """Test method to check if AI is working"""

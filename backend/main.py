@@ -92,14 +92,14 @@ async def health_check():
         return {
             "status": "healthy",
             "database": "connected",
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now().isoformat()
         }
     except Exception as e:
         logger.error(f"Health check failed: {e}")
         return {
             "status": "unhealthy",
             "error": str(e),
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now().isoformat()
         }
 
 @app.get("/stats")
@@ -129,7 +129,7 @@ async def create_work_update(work_update: WorkUpdateCreate):
                 )
         
         db = get_database()
-        today_date = datetime.utcnow().strftime('%Y-%m-%d')
+        today_date = datetime.now().strftime('%Y-%m-%d')
         
         if work_update.work_status == WorkStatus.ON_LEAVE:
             # ON LEAVE: Save directly to permanent collection
@@ -139,7 +139,7 @@ async def create_work_update(work_update: WorkUpdateCreate):
 
             update_dict = work_update.dict(exclude={"id"})
             update_dict["update_date"] = today_date
-            update_dict["submittedAt"] = datetime.utcnow()
+            update_dict["submittedAt"] = datetime.now()
             update_dict["followupCompleted"] = True  # No follow-up needed for leave
             update_dict["status"] = "completed"  
 
@@ -166,7 +166,7 @@ async def create_work_update(work_update: WorkUpdateCreate):
             # WORKING: Save to TEMPORARY collection (pending follow-up)
             update_dict = work_update.dict(exclude={"id"})
             update_dict["update_date"] = today_date
-            update_dict["submittedAt"] = datetime.utcnow()
+            update_dict["submittedAt"] = datetime.now()
             update_dict["status"] = "pending_followup"  
             update_dict["followupCompleted"] = False
 
@@ -208,7 +208,7 @@ async def start_followup_session(
         if not temp_work_update:
             raise HTTPException(status_code=404, detail="Temporary work update not found")
 
-        today_date = datetime.utcnow().strftime('%Y-%m-%d')
+        today_date = datetime.now().strftime('%Y-%m-%d')
         session_date_id = f"{user_id}_session_{today_date}"
 
         # Generate questions using temp data
@@ -229,7 +229,7 @@ async def start_followup_session(
             "questions": questions,
             "answers": [""] * len(questions),
             "status": SessionStatus.PENDING,
-            "createdAt": datetime.utcnow(),
+            "createdAt": datetime.now(),
             "completedAt": None
         }
         await followup_collection.replace_one({"_id": session_date_id}, session_doc, upsert=True)
@@ -290,7 +290,7 @@ async def complete_followup_session(
         session_update = {
             "answers": answers_update.answers,
             "status": SessionStatus.COMPLETED,
-            "completedAt": datetime.utcnow()
+            "completedAt": datetime.now()
         }
         
         await followup_collection.update_one(
@@ -301,7 +301,7 @@ async def complete_followup_session(
         # MOVE temp work update to permanent collection using database function
         final_work_update_id = await move_temp_to_permanent(
             session["tempWorkUpdateId"],
-            {"completedAt": datetime.utcnow()}
+            {"completedAt": datetime.now()}
         )
 
         # Update session with permanent work update ID
