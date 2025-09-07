@@ -1,5 +1,6 @@
 import google.generativeai as genai
 from datetime import datetime, timedelta
+import uuid
 from typing import List, Dict, Any, Optional
 import logging
 import re
@@ -157,8 +158,40 @@ class AIFollowupService:
         yesterday_plans = self._extract_yesterday_plans_from_recent_docs(recent_docs)
         current_challenges = self._extract_current_challenges(current_context)
         seven_day_history = history_context
+
+#         prompt = f"""You're helping a supervisor create simple, easy-to-answer follow-up questions for an intern's daily work update.
+
+# **Today's Work Update:** {current_context}
+
+# **Yesterday's Plans:** {yesterday_plans}
+
+# Generate exactly 3 simple questions that:
+# 1. Are easy to answer with 1-2 sentences
+# 2. Sound friendly and conversational
+# 3. Focus on today's work specifically
+# 4. Are not technical or complex
+# 5. Help understand progress without being demanding
+# 6. At least one question should check if the tasks or goals from 'Yesterday's Plans' were completed or addressed in 'Today's Work Update'.
+
+# Examples of good simple questions:
+# - "How did the [task] go today?"
+# - "Were you able to finish [specific thing]you planned yesterday??"
+# - "Any quick updates on [project]you mentioned in your plans?"
+
+# Avoid questions about:
+# - Tomorrow's plans
+# - Feelings or emotions
+# - Complex technical details
+# - Long explanations
+
+# Format your response as:
+# 1. [First simple question]
+# 2. [Second simple question]
+# 3. [Third simple question]"""
+
+#         return prompt
         
-        prompt = f"""You're a AI supervisor helping generate follow-up questions for an intern's daily work update. This is just a end-of-day check-in to see how things went.
+        prompt = f"""You're a AI supervisor helping generate simple, easy-to-answer follow-up questions for an intern's daily work update. This is just a end-of-day check-in to see how things went.
 
 ## CONTEXT:
 **Today's Work:** {today_work_update}
@@ -363,6 +396,7 @@ make them feel natural to answer."""
         try:
             formatted_date = datetime.now().strftime('%Y-%m-%d')
             session_id = f"{user_id}_{formatted_date}"
+            #session_id = f"{user_id}_{uuid.uuid4().hex}"
             
             followup_collection = self.db[Config.FOLLOWUP_SESSIONS_COLLECTION]
             

@@ -312,7 +312,7 @@ const FollowupRedirectScreen = ({
 // Main Work Update System Component
 const WorkUpdateSystem = () => {
   const [userId, setUserId] = useState('');
-  const [workStatus, setWorkStatus] = useState('working'); // 'working' or 'onLeave'
+  const [workStatus, setWorkStatus] = useState('working'); // 'working', 'work from home', or 'onLeave'
   const [description, setDescription] = useState('');
   const [challengesFaced, setChallengesFaced] = useState('');
   const [plansForTomorrow, setPlansForTomorrow] = useState('');
@@ -330,8 +330,8 @@ const WorkUpdateSystem = () => {
       return;
     }
 
-    // If working, require description. If on leave, description is optional
-    if (workStatus === 'working' && !description.trim()) {
+    // If working or work from home, require description. If on leave, description is optional
+    if ((workStatus === 'working' || workStatus === 'work from home') && !description.trim()) {
       alert('Please enter your work description');
       return;
     }
@@ -348,6 +348,15 @@ const WorkUpdateSystem = () => {
           "description": description.trim() || "On Leave",
           "challenges": "",
           "plans": ""
+        };
+      } else if (workStatus === 'work from home') {
+        // Work from home submission - treat as working
+        workUpdateData = {
+          "userId": userId.trim(),
+          "work_status": "work_from_home",
+          "description": description.trim(),
+          "challenges": challengesFaced.trim() || "",
+          "plans": plansForTomorrow.trim() || ""
         };
       } else {
         // Working submission - full data
@@ -387,9 +396,8 @@ const WorkUpdateSystem = () => {
         // On leave - work update saved permanently, no follow-up needed
         alert('Your leave status has been submitted successfully!');
         resetForm();
-      } else {
-        // Working - work update saved to temp, need follow-up to finalize
-        // Store temp work update ID for follow-up
+      } else if (workStatus === 'working' || workStatus === 'work from home') {
+        // Working or work from home - work update saved to temp, need follow-up to finalize
         setTempWorkUpdateId(result.tempWorkUpdateId);
         setShowFollowupRedirect(true);
       }
@@ -592,6 +600,30 @@ const WorkUpdateSystem = () => {
               cursor: 'pointer',
               padding: '12px 16px',
               border: '2px solid',
+              borderColor: workStatus === 'work from home' ? '#4A90E2' : '#ddd',
+              borderRadius: '8px',
+              backgroundColor: workStatus === 'work from home' ? '#f0f8ff' : 'white',
+              flex: 1,
+              textAlign: 'center'
+            }}>
+              <input
+                type="radio"
+                value="work from home"
+                checked={workStatus === 'work from home'}
+                onChange={(e) => setWorkStatus(e.target.value)}
+                style={{ marginRight: '8px' }}
+              />
+              <span style={{ fontWeight: workStatus === 'work from home' ? 'bold' : 'normal' }}>
+                Work From Home
+              </span>
+            </label>
+
+            <label style={{
+              display: 'flex',
+              alignItems: 'center',
+              cursor: 'pointer',
+              padding: '12px 16px',
+              border: '2px solid',
               borderColor: workStatus === 'onLeave' ? '#FF9800' : '#ddd',
               borderRadius: '8px',
               backgroundColor: workStatus === 'onLeave' ? '#fff8e1' : 'white',
@@ -613,7 +645,7 @@ const WorkUpdateSystem = () => {
         </div>
 
         {/* Work Description - Only show when working */}
-        {workStatus === 'working' && (
+        {(workStatus === 'working' || workStatus === 'work from home') && (
           <div style={{ marginBottom: '24px' }}>
             <label style={{
               display: 'block',
@@ -642,7 +674,7 @@ const WorkUpdateSystem = () => {
         )}
 
         {/* Show additional fields only when working */}
-        {workStatus === 'working' && (
+        {(workStatus === 'working' || workStatus === 'work from home') && (
           <>
             {/* Challenges Faced - Optional */}
             <div style={{ marginBottom: '24px' }}>

@@ -11,6 +11,7 @@ class SessionStatus(str, Enum):
 class WorkStatus(str, Enum):
     WORKING = "working"
     ON_LEAVE = "on_leave"
+    WORK_FROM_HOME = "work_from_home"
 
 class WorkUpdateCreate(BaseModel):
     userId: str
