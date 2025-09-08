@@ -1,3 +1,4 @@
+import uuid
 from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -317,7 +318,8 @@ async def start_followup_session(
             )
 
         today_date = datetime.now().strftime('%Y-%m-%d')
-        session_date_id = f"{user_id}_session_{today_date}"
+        #session_date_id = f"{user_id}_session_{today_date}"
+        session_date_id = f"{user_id}_{uuid.uuid4().hex}"
 
         # Generate questions using temp data
         ai_input_data = {

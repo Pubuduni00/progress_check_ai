@@ -394,9 +394,9 @@ make them feel natural to answer."""
         logger.info(f"Called save_followup_session with userId: {user_id}")
         
         try:
-            formatted_date = datetime.now().strftime('%Y-%m-%d')
-            session_id = f"{user_id}_{formatted_date}"
-            #session_id = f"{user_id}_{uuid.uuid4().hex}"
+            #formatted_date = datetime.now().strftime('%Y-%m-%d')
+            #session_id = f"{user_id}_{formatted_date}"
+            session_id = f"{user_id}_{uuid.uuid4().hex}"
             
             followup_collection = self.db[Config.FOLLOWUP_SESSIONS_COLLECTION]
             
