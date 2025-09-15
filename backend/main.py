@@ -43,7 +43,6 @@ async def scheduled_cleanup_task():
             
             if ttl_working:
                 logger.info("TTL index is active - automatic deletion is working")
-                # Still run manual cleanup as backup, but less frequent
                 result = await cleanup_abandoned_temp_updates(25)  # Clean slightly older items as backup
             else:
                 logger.warning("TTL index not found! Running manual cleanup more aggressively")
@@ -318,7 +317,6 @@ async def start_followup_session(
             )
 
         today_date = datetime.now().strftime('%Y-%m-%d')
-        #session_date_id = f"{user_id}_session_{today_date}"
         session_date_id = f"{user_id}_{uuid.uuid4().hex}"
 
         # Generate questions using temp data

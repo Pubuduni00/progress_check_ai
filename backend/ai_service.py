@@ -159,86 +159,38 @@ class AIFollowupService:
         current_challenges = self._extract_current_challenges(current_context)
         seven_day_history = history_context
 
-#         prompt = f"""You're helping a supervisor create simple, easy-to-answer follow-up questions for an intern's daily work update.
+ 
 
-# **Today's Work Update:** {current_context}
 
-# **Yesterday's Plans:** {yesterday_plans}
 
-# Generate exactly 3 simple questions that:
-# 1. Are easy to answer with 1-2 sentences
-# 2. Sound friendly and conversational
-# 3. Focus on today's work specifically
-# 4. Are not technical or complex
-# 5. Help understand progress without being demanding
-# 6. At least one question should check if the tasks or goals from 'Yesterday's Plans' were completed or addressed in 'Today's Work Update'.
+        prompt = f"""You're helping a supervisor create simple, easy-to-answer follow-up questions for an intern's daily work update.
 
-# Examples of good simple questions:
-# - "How did the [task] go today?"
-# - "Were you able to finish [specific thing]you planned yesterday??"
-# - "Any quick updates on [project]you mentioned in your plans?"
-
-# Avoid questions about:
-# - Tomorrow's plans
-# - Feelings or emotions
-# - Complex technical details
-# - Long explanations
-
-# Format your response as:
-# 1. [First simple question]
-# 2. [Second simple question]
-# 3. [Third simple question]"""
-
-#         return prompt
-        
-        prompt = f"""You're a AI supervisor helping generate simple, easy-to-answer follow-up questions for an intern's daily work update. This is just a end-of-day check-in to see how things went.
-
-## CONTEXT:
 **Today's Work:** {today_work_update}
 **What They Planned (from yesterday):** {yesterday_plans}
 **Current Challenges:** {current_challenges}
 **Recent Work History:** {seven_day_history}
 
-##GOALS:
-- Detect gaps, inefficiencies, or deviations from expected progress.
-- Verify whether the intern work today matches the tasks they planned yesterday.
-- Detect whether the intern trajectory shows steady progress toward final completion.
-- Provide signals that can later be aggregated into a supervisor performance report.
-- Identify whether the intern followed through on their planned tasks.
-
-## YOUR TASK:
-Generate exactly 3 conversational questions that:
-- Are quick and easy to answer (1-2 sentences each)
-- Sound like a superviosr checking in slightly formal style
-- Help understand if they're progressing well 
-- Focus on practical stuff they are working with
-- Are specific to their actual work, not generic
-- Dont ask about plans for tomorrow
-- Prioritize the information in the current update if no history is provided
-- Each question should help measure progress objectively (e.g., completion of planned work, handling of challenges, alignment with project goals).
-- Ask the question directly no need to explain why you are asking it.
-- Avoid asking the intern directly about effort or feelings; instead, frame questions that the AI can later answer by analyzing the data.
-- Always compare {yesterday_plans} field with {today_work_update} field practically when generating follow-up technical questions. 
-- Generate questions that ONLY ask about the exact work, challenges, and plans mentioned in {yesterday_plans} 
+Generate exactly 3 simple questions that:
+1. Are easy to answer with 1-2 sentences
+2. Sound friendly and conversational to understand progress without being demanding
+3. Focus on today's work specifically 
+4. When says they completed a task,ask them to describe the steps they followed in a general but specific-enough way, so we can understand how the work was approached and verify it was actually done
+7. If {yesterday_plans} exists verify {today_work_update} matches {yesterday_plans} naturally .
 
 
-## QUESTION STYLE:
-Keep it conversational."
+Avoid questions about:
+- Feelings or emotions
+- Complex technical details
+- Long explanations
 
+Format your response as:
+1. [First simple question] 
+2. [Second simple question]
+3. [Third simple question]"""
 
-## WHAT TO FOCUS ON:
-- If they had plans yesterday, check whether they completed them and note any progress
-- Look they have actually working or just filling the work update
-- Look for any recurring issues that they need attention
-
-Generate exactly 3 questions in this format:
-1. [First question]
-2. [Second question]
-3. [Third question]
-
-make them feel natural to answer."""
-        
         return prompt
+        
+ 
     
     def _extract_yesterday_plans_from_recent_docs(self, recent_docs: List[Dict[str, Any]]) -> str:
         """Extract yesterday's plans from the most recent work update that has plans"""
