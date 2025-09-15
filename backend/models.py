@@ -15,20 +15,18 @@ class WorkStatus(str, Enum):
 
 class WorkUpdateCreate(BaseModel):
     userId: str
-    # Add work status field (radio button: working/on_leave)
-    work_status: WorkStatus = WorkStatus.WORKING  # Default to working
+    work_status: WorkStatus = WorkStatus.WORKING  
     description: Optional[str] = None  
-    challenges: Optional[str] = None  # Challenges for today (optional)
-    plans: Optional[str] = None  # Plans for tomorrow (optional)
+    challenges: Optional[str] = None 
+    plans: Optional[str] = None  
     submittedAt: Optional[datetime] = Field(default_factory=datetime.utcnow)
-    # Date-based tracking for same-day override
     update_date: Optional[str] = Field(default=None)  
 
 class WorkUpdate(WorkUpdateCreate):
     id: Optional[str] = Field(default=None, alias="_id")   
-    followupCompleted: Optional[bool] = Field(default=False)  # Track followup completion
+    followupCompleted: Optional[bool] = Field(default=False)   
     # Add date-based session tracking
-    session_date_id: Optional[str] = Field(default=None)  # Store date-based session ID
+    session_date_id: Optional[str] = Field(default=None)   
     # Track if followup was skipped due to leave
     followup_skipped: Optional[bool] = Field(default=False)
     

@@ -35,5 +35,5 @@ npm start
 ```bash
 cd backend
 pip install -r requirements.txt
-python main.py
+python -m uvicorn main:app --reload
 
